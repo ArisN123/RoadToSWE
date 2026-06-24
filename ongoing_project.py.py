@@ -1,6 +1,12 @@
 def get_data(prompt):
       return input(prompt)
 
+def normalise(input_string):
+    input_string = input_string.strip().lower().replace('-',' ')
+    input_string = " ".join(input_string.split())
+    return input_string
+
+
 def create_review_breakdown(name, country, dob, PEP_status):
     return f'''=== SANCTIONS SCREENING SYSTEM ===
 name: {name}
@@ -8,18 +14,15 @@ country: {country}
 dob: {dob}
 PEP Status: {PEP_status}
 Status: PENDING REVIEW'''
-def sanction_review(name, watchlist):
-    if name in watchlist:
-        output = f"{name} - BLOCKED due to full name match"
-    else:
-        output = f"{name} - CLEAR"
-    return output
+
 def screen_customer(user_info,watchlist):
     for person in watchlist:
-        if user_info['name'] == person['name'] and user_info['dob'] == person['dob']:
+       # print(f'{user_info['name']} noramlised to {normalise(user_info['name'])}')
+        print(f'{person['name']} noramlised to {normalise(person['name'])}')
+        if normalise(user_info['name']) == normalise(person['name']) and user_info['dob'] == person['dob']:
                 return person
 
-watchlist = watchlist = [
+watchlist = [
     {"name": "Ali Hassan",       "dob": "22-10-1980", "country": "IR", "reason": "OFAC SDN — proliferation financing"},
     {"name": "John Kim",         "dob": "05-03-1975", "country": "KP", "reason": "OFAC SDN"},
     {"name": "Sara Petrov",      "dob": "14-07-1988", "country": "RU", "reason": "EU sanctions"},
@@ -32,11 +35,22 @@ watchlist = watchlist = [
 user_info_db = [{'name':'Aris Niamonitakis', 'dob':'23-11-2001'},
             {'name':'Ali Hassan', 'dob':'22-10-1980'},
             {'name':'Katya Sad', 'dob':'19-09-1983'}]
-final_result = 'Cleared'  
+
+clear_count = 0
+risk_count = 0
+clear_list =[]
+risk_list= []
 for user in user_info_db:
     screened_results = screen_customer(user,watchlist)
-    print(screened_results)
     if screened_results:
-        final_result = 'BLOCKED'
-    print(f'{user['name']} is {final_result}')
-    final_result = 'Cleared'
+         print(f'{user['name']} is blocked')
+         risk_count += 1
+         risk_list.append(user['name']) 
+    else:
+        print(f'{user['name']} is Cleared')
+        clear_count += 1
+        clear_list.append(user['name'])
+
+print(f'{clear_count+risk_count} people screened\n{clear_count} people are clear, {risk_count} people are risky.\n Clear People are: {clear_list}\n Risky People are: {risk_list}')
+
+
