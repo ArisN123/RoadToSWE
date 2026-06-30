@@ -28,12 +28,14 @@ def choose_word():
 
 
 #user input response recording
-def get_user_input():
+def get_user_input(rev_list, guess_list):
     while True:
         output = input("please select a letter: \n")
         if len(output)==1:
-            if re.search("[a-zA-Z]", output) is not None:
-                return(output.upper())
+            if output.upper() in rev_list or output.upper() in guess_list:
+                print(f'You already guessed the letter {output.upper()}')
+            elif re.search("[a-zA-Z]", output) is not None:
+                    return(output.upper())
             else:
                 print('invalid input, please selecter a letter')
         else:
@@ -84,7 +86,7 @@ def play_Hangman():
         placeholder_revealed_letters = hangman_game.revealed_letters[:]
         print(f'You have {hangman_game.guesses_left_counter} guess(es) left')
 
-        user_letter = get_user_input()
+        user_letter = get_user_input(hangman_game.revealed_letters,hangman_game.guessed)
         get_wrong_letters_list(hangman_game.guessed, user_letter, hangman_game.word)
         hangman_game.revealed_letters = compare_chosen_letter_against_list(user_letter, hangman_game.revealed_letters, hangman_game.word)
         
@@ -110,5 +112,6 @@ def play_Hangman():
 
 
 if __name__ == '__main__':
+
     play_Hangman()
 
